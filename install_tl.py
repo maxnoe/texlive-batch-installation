@@ -34,7 +34,3 @@ if __name__ == '__main__':
             print(child.readline().decode().strip())
     except pexpect.EOF:
         print('Installation seems to be finished')
-
-    if 'Welcome' not in child.read():
-        print('Installation did not terminate successfull')
-        sys.exit(1)
