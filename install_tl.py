@@ -1,35 +1,36 @@
 import pexpect
 from glob import glob
 import os
+import sys
 
+
+def command(pattern, send, **kwargs):
+    child.expect(pattern, **kwargs)
+    print(child.before.decode())
+    print(child.after.decode())
+    child.sendline(send)
 
 if __name__ == '__main__':
     install_script = glob('install-tl-*/install-tl')
 
-    os.environ['TEXLIVE_INSTALL_PREFIX'] = '/home/travis/texlive'
     child = pexpect.spawn(install_script)
 
     try:
-        child.expect('Import settings from previous TeX Live installation', timeout=10)
-        print(child.before.decode())
-        print(child.after.decode())
-        child.sendline('n')
+        command('Import settings from previous TeX Live installation', 'n', timeout=10)
     except pexpect.TIMEOUT:
         print('No previous installation found')
 
     try:
-        child.expect('Enter command:', timeout=10)
-        print(child.before.decode())
-        print(child.after.decode())
-        child.sendline('I')
+        command('Enter command:', 'C', timeout=10)
+        command('Enter letter', '-acfghkyIKLMSW',  timeout=10)
+        command('Enter letter', 'R',  timeout=10)
+        command('Enter command:', 'I', timeout=10)
     except pexpect.TIMEOUT:
         print('Something went wrong')
+        sys.exit(1)
 
     try:
-        while True:
-            try:
-                print(child.readline().decode().strip())
-            except pexpect.TIMEOUT:
-                pass
+        while not child.terminated:
+            print(child.readline().decode().strip())
     except pexpect.EOF:
         print('Installation seems to be finished')
