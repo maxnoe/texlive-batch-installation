@@ -27,6 +27,9 @@ if __name__ == '__main__':
 
     try:
         while True:
-            print(child.readline().decode().strip())
+            try:
+                print(child.readline().decode().strip())
+            except pexpect.TIMEOUT:
+                pass
     except pexpect.EOF:
         print('Installation seems to be finished')
