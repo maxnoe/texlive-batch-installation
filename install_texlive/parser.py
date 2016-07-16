@@ -25,3 +25,16 @@ parser.add_argument(
     '-p', '--prefix', dest='prefix',
     help='Installation prefix, equivalent to setting TEXLIVE_INSTALL_PREFIX'
 )
+
+parser.add_argument(
+    '-c', '--collections', dest='collections',
+    help=(
+        'The TeX Live package collections to install.'
+        ' E.g. -a to deselect all and only install the absolute basic TeX packages'
+    )
+)
+
+parser.add_argument(
+    '-s', '--scheme', dest='scheme', choices=set('abcdefghijk'),
+    help='The TeX Live scheme to install. Default is "full"'
+)

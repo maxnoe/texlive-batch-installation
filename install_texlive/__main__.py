@@ -12,6 +12,8 @@ from .parser import parser
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('install_texlive')
 
+timeout = 30
+
 
 def main():
     args = parser.parse_args()
@@ -35,25 +37,32 @@ def main():
     else:
         cmd = install_script + ' --repository=' + OLDURL.format(v=args.version)
 
-    print(cmd)
+    log.info(cmd)
 
-    tl = pexpect.spawn(cmd)
+    tl = pexpect.spawn(cmd, timeout=timeout)
 
     try:
-        command(tl, 'installation.profile', 'N', timeout=10)
+        command(tl, 'installation.profile', 'N', timeout=timeout)
     except pexpect.TIMEOUT:
         pass
 
     try:
-        command(tl, 'Import settings', 'y' if args.keep else 'n', timeout=10)
+        command(tl, 'Import settings', 'y' if args.keep else 'n', timeout=timeout)
     except pexpect.TIMEOUT:
         log.info('No previous installation found')
 
     try:
-        #  command('Enter command:', 'C', timeout=10)
-        #  command('Enter letter', '-acfghkyIKLMSW',  timeout=10)
-        #  command('Enter letter', 'R',  timeout=10)
-        command(tl, 'Enter command:', 'I', timeout=10)
+        if args.scheme:
+            command(tl, 'Enter command:', 'S', timeout=timeout)
+            command(tl, 'Enter letter', args.scheme,  timeout=timeout)
+            command(tl, 'Enter letter', 'R',  timeout=timeout)
+
+        if args.collections:
+            command(tl, 'Enter command:', 'C', timeout=timeout)
+            command(tl, 'Enter letter', args.collections,  timeout=timeout)
+            command(tl, 'Enter letter', 'R',  timeout=timeout)
+
+        command(tl, 'Enter command:', 'I', timeout=timeout)
         log.info('Starting installation')
     except pexpect.TIMEOUT:
         print('Something went wrong')
