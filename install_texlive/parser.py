@@ -38,3 +38,13 @@ parser.add_argument(
     '-s', '--scheme', dest='scheme', choices=set('abcdefghijk'),
     help='The TeX Live scheme to install. Default is "full"'
 )
+
+parser.add_argument(
+    '-u', '--update', dest='update', action='store_true',
+    help='Update TeX Live after installation is finished'
+)
+
+parser.add_argument(
+    '-i', '--install', dest='install',
+    help='Additional packages to install after the main Installation has finished'
+)

@@ -4,6 +4,8 @@ import os
 import sys
 import logging
 import tempfile
+import re
+import subprocess as sp
 
 from . import command, download, OLDURL
 from .parser import parser
@@ -29,6 +31,7 @@ def main():
 
     if args.install_tl:
         install_script = args.install_tl
+        cmd = install_script
     else:
         directory = os.path.join(
             tempfile.gettempdir(), 'texlive-' + (args.version or 'current')
@@ -36,10 +39,10 @@ def main():
         download(version=args.version, outdir=directory)
         install_script = glob(os.path.join(directory, 'install-tl-*/install-tl'))[-1]
 
-    if args.version is None:
-        cmd = install_script
-    else:
-        cmd = install_script + ' --repository=' + OLDURL.format(v=args.version)
+        if args.version is None:
+            cmd = install_script
+        else:
+            cmd = install_script + ' --repository=' + OLDURL.format(v=args.version)
 
     log.info(cmd)
 
@@ -72,9 +75,12 @@ def main():
         print('Something went wrong')
         sys.exit(1)
 
+    lines = ''
     try:
         while not tl.terminated:
-            log.debug(tl.readline().decode().strip())
+            line = tl.readline().decode()
+            log.debug(line.strip())
+            lines += line
     except pexpect.EOF:
         log.error('EOF')
 
@@ -83,8 +89,28 @@ def main():
         log.info('Installation installed succesfully')
     else:
         log.error('Installation did not finish succesfully')
+        sys.exit(tl.exitstatus)
 
-    sys.exit(tl.exitstatus)
+    bindir = re.findall(r'Most importantly, add\s+(.*)\s+to your PATH', lines)[0].strip()
+    version = re.findall(r'20[0-9][0-9]', bindir)[0]
+    env = os.environ
+    env['PATH'] = os.path.abspath(bindir) + ':' + env['PATH']
+
+    if version != '2016':
+        sp.Popen(['tlmgr', 'option', 'repository', OLDURL.format(v=version)], env=env)
+
+    if args.update:
+        log.info('Start updating')
+        sp.Popen(
+            ['tlmgr', 'update', '--self', '--all', '--reinstall-forcibly-removed'],
+            env=env,
+        ).wait()
+        log.info('Finished')
+
+    if args.install:
+        log.info('Start installing addtional packages')
+        sp.Popen(['tlmgr', 'install', args.install], env=env).wait()
+        log.info('Finished')
 
 
 if __name__ == '__main__':
