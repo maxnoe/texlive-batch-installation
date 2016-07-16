@@ -33,6 +33,6 @@ def download(version=None, outdir='.'):
 
 def command(process, pattern, send, **kwargs):
     process.expect(pattern, **kwargs)
-    log.info(process.before.decode())
-    log.info(process.after.decode())
+    log.debug(process.before.decode())
+    log.debug(process.after.decode())
     process.sendline(send)

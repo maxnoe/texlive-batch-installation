@@ -25,10 +25,14 @@ def main():
         os.environ['TEXLIVE_INSTALL_PREFIX'] = args.prefix
         os.makedirs(args.prefix, exist_ok=True)
 
+    log.info('Installing texlive to {}'.format(args.prefix or '/usr/local/texlive'))
+
     if args.install_tl:
         install_script = args.install_tl
     else:
-        directory = os.path.join(tempfile.gettempdir(), args.version or 'current')
+        directory = os.path.join(
+            tempfile.gettempdir(), 'texlive-' + (args.version or 'current')
+        )
         download(version=args.version, outdir=directory)
         install_script = glob(os.path.join(directory, 'install-tl-*/install-tl'))[-1]
 
@@ -42,12 +46,12 @@ def main():
     tl = pexpect.spawn(cmd, timeout=timeout)
 
     try:
-        command(tl, 'installation.profile', 'N', timeout=timeout)
+        command(tl, 'installation.profile', 'N', timeout=5)
     except pexpect.TIMEOUT:
         pass
 
     try:
-        command(tl, 'Import settings', 'y' if args.keep else 'n', timeout=timeout)
+        command(tl, 'Import settings', 'y' if args.keep else 'n', timeout=5)
     except pexpect.TIMEOUT:
         log.info('No previous installation found')
 
@@ -72,9 +76,14 @@ def main():
         while not tl.terminated:
             log.debug(tl.readline().decode().strip())
     except pexpect.EOF:
-        log.info('Installation seems to be finished')
+        log.error('EOF')
 
     tl.close()
+    if tl.exitstatus == 0:
+        log.info('Installation installed succesfully')
+    else:
+        log.error('Installation did not finish succesfully')
+
     sys.exit(tl.exitstatus)
 
 
