@@ -24,6 +24,7 @@ def main():
         log.level = logging.DEBUG
 
     if args.prefix:
+        args.prefix = os.path.abspath(args.prefix)
         os.environ['TEXLIVE_INSTALL_PREFIX'] = args.prefix
         os.makedirs(args.prefix, exist_ok=True)
 
@@ -97,7 +98,10 @@ def main():
     env['PATH'] = os.path.abspath(bindir) + ':' + env['PATH']
 
     if version != '2016':
-        sp.Popen(['tlmgr', 'option', 'repository', OLDURL.format(v=version)], env=env)
+        sp.Popen(
+            ['tlmgr', 'option', 'repository', OLDURL.format(v=version)],
+            env=env
+        ).wait()
 
     if args.update:
         log.info('Start updating')
