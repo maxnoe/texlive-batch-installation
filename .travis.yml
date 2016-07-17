@@ -4,7 +4,7 @@ python: 3.5
 
 install:
   - pip install pexpect
-  - python -m install_texlive -c="-acfghkyIKLMSW" -p /home/travis/texlive
+  - python -m install_texlive -c="-acfghkyIKLMSW" -p /home/travis/texlive -v
   - export PATH=/home/travis/texlive/2016/bin/x86_64-linux:$PATH
 
 script:
