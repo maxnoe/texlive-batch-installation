@@ -1,4 +1,4 @@
-# texlive batch install
+# texlive batch install [![Build Status](https://travis-ci.org/MaxNoe/texlive-batch-installation.svg?branch=master)](https://travis-ci.org/MaxNoe/texlive-batch-installation)
 
 The TeX Live installer does not allow for interaction less installation.
 This is the reason why I created this project using pexpect to talk to the `install-tl`
