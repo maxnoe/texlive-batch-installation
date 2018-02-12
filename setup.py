@@ -14,5 +14,9 @@ setup(
     install_requires=[
         'pexpect',
     ],
-    entry_points={'console_scripts': ['install_texlive = install_texlive.__main__:main']},
+    entry_points={
+        'console_scripts': [
+            'install_texlive = install_texlive.__main__:main',
+        ]
+    },
 )

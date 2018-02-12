@@ -1,6 +1,8 @@
 import logging
 import subprocess as sp
 import os
+import pexpect
+import re
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +35,19 @@ def download(version=None, outdir='.'):
 
 def command(process, pattern, send, **kwargs):
     process.expect(pattern, **kwargs)
-    log.debug(process.before.decode())
-    log.debug(process.after.decode())
     process.sendline(send)
+
+
+def get_size(process):
+    timeout = process.timeout
+    process.timeout = 1
+    lines = ''
+    try:
+        while True:
+            lines += process.readline().decode()
+    except pexpect.TIMEOUT:
+        pass
+
+    size = re.findall(r'disk space required: ([0-9]+ MB)', lines)[-1]
+    process.timeout = timeout
+    return size

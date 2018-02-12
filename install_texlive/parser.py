@@ -48,3 +48,13 @@ parser.add_argument(
     '-i', '--install', dest='install',
     help='Additional packages to install after the main Installation has finished'
 )
+
+parser.add_argument(
+    '--source', action='store_true',
+    help='Install the source tree',
+)
+
+parser.add_argument(
+    '--docs', action='store_true',
+    help='Install the docs tree',
+)

@@ -7,7 +7,7 @@ import tempfile
 import re
 import subprocess as sp
 
-from . import command, download, OLDURL
+from . import command, download, OLDURL, get_size
 from .parser import parser
 
 
@@ -62,18 +62,29 @@ def main():
     try:
         if args.scheme:
             command(tl, 'Enter command:', 'S', timeout=timeout)
-            command(tl, 'Enter letter', args.scheme,  timeout=timeout)
-            command(tl, 'Enter letter', 'R',  timeout=timeout)
+            command(tl, 'Enter letter', args.scheme, timeout=timeout)
+            command(tl, 'Enter letter', 'R', timeout=timeout)
 
         if args.collections:
             command(tl, 'Enter command:', 'C', timeout=timeout)
-            command(tl, 'Enter letter', args.collections,  timeout=timeout)
-            command(tl, 'Enter letter', 'R',  timeout=timeout)
+            command(tl, 'Enter letter', args.collections, timeout=timeout)
+            command(tl, 'Enter letter', 'R', timeout=timeout)
 
-        command(tl, 'Enter command:', 'I', timeout=timeout)
+        if not args.docs:
+            command(tl, 'Enter command:', 'O', timeout=timeout)
+            command(tl, 'Enter command:', 'D', timeout=timeout)
+            command(tl, 'Enter command:', 'R', timeout=timeout)
+
+        if not args.source:
+            command(tl, 'Enter command:', 'O', timeout=timeout)
+            command(tl, 'Enter command:', 'S', timeout=timeout)
+            command(tl, 'Enter command:', 'R', timeout=timeout)
+
+        log.info('Installation size will be {}'.format(get_size(tl)))
         log.info('Starting installation')
+        command(tl, 'Enter command:', 'I', timeout=timeout)
     except pexpect.TIMEOUT:
-        print('Something went wrong')
+        log.error('Something went wrong')
         sys.exit(1)
 
     lines = ''
