@@ -97,7 +97,7 @@ def main():
     env = os.environ
     env['PATH'] = os.path.abspath(bindir) + ':' + env['PATH']
 
-    if version != '2016':
+    if version != '2017':
         sp.Popen(
             ['tlmgr', 'option', 'repository', OLDURL.format(v=version)],
             env=env
