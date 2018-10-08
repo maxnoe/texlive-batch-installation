@@ -6,9 +6,10 @@ script.
 
 Usage:
 ```
-install_texlive [-h] [-v] [-t VERSION] [--install-tl INSTALL_TL] [-k]
+usage: install_texlive [-h] [-v] [-t VERSION] [--install-tl INSTALL_TL] [-k]
                        [-p PREFIX] [-c COLLECTIONS]
-                       [-s {d,i,e,j,c,g,b,f,a,h,k}]
+                       [-s {f,g,d,i,k,c,e,h,b,j,a}] [-u] [-i INSTALL]
+                       [--source] [--docs]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -26,6 +27,12 @@ optional arguments:
                         The TeX Live package collections to install. E.g. -a
                         to deselect all and only install the absolute basic
                         TeX packages
-  -s {d,i,e,j,c,g,b,f,a,h,k}, --scheme {d,i,e,j,c,g,b,f,a,h,k}
-                        The TeX Live scheme to install. Default is "full" (a)
+  -s {f,g,d,i,k,c,e,h,b,j,a}, --scheme {f,g,d,i,k,c,e,h,b,j,a}
+                        The TeX Live scheme to install. Default is "full"
+  -u, --update          Update TeX Live after installation is finished
+  -i INSTALL, --install INSTALL
+                        Additional packages to install after the main
+                        Installation has finished
+  --source              Install the source tree
+  --docs                Install the docs tree
 ```
