@@ -46,7 +46,7 @@ parser.add_argument(
 
 parser.add_argument(
     '-i', '--install', dest='install',
-    help='Additional packages to install after the main Installation has finished'
+    help='Additional packages to install after the main Installation has finished as comma separated list'
 )
 
 parser.add_argument(

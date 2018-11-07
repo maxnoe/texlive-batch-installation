@@ -3,6 +3,7 @@ import subprocess as sp
 import os
 import pexpect
 import re
+from datetime import date
 
 log = logging.getLogger(__name__)
 
@@ -13,17 +14,24 @@ URL = 'http://mirror.ctan.org/systems/texlive/tlnet/'
 OLDURL = 'ftp://tug.org/historic/systems/texlive/{v}/tlnet-final/'
 
 
+def is_current(version):
+    today = date.today()
+    current_year = int(version) == today.year
+    last_year = int(version) == (today.year - 1) and today.month() < 7
+    return current_year or last_year
+
+
 def download(version=None, outdir='.'):
     os.makedirs(outdir, exist_ok=True)
 
-    if version is None:
+    if version is None or is_current(version):
         url = URL + 'install-tl-unx.tar.gz'
     else:
         url = OLDURL.format(v=version) + 'install-tl-unx.tar.gz'
 
     if has_curl:
         log.info('Start downloading TeX Live {} using curl'.format(version or 'current'))
-        download = sp.Popen(['curl', '-L', url], stdout=sp.PIPE, stderr=sp.PIPE)
+        download = sp.Popen(['curl', '--fail', '-L', url], stdout=sp.PIPE, stderr=sp.PIPE)
     elif has_wget:
         log.info('Start downloading TeX Live {} using wget'.format(version or 'current'))
         download = sp.Popen(['wget', '-qO-', url], stdout=sp.PIPE, stderr=sp.PIPE)

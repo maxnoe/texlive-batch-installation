@@ -7,7 +7,7 @@ import tempfile
 import re
 import subprocess as sp
 
-from . import command, download, OLDURL, get_size
+from . import command, download, OLDURL, get_size, is_current
 from .parser import parser
 
 
@@ -40,7 +40,7 @@ def main():
         download(version=args.version, outdir=directory)
         install_script = glob(os.path.join(directory, 'install-tl-*/install-tl'))[-1]
 
-        if args.version is None:
+        if args.version is None or is_current(args.version):
             cmd = install_script
         else:
             cmd = install_script + ' --repository=' + OLDURL.format(v=args.version)
@@ -108,7 +108,7 @@ def main():
     env = os.environ
     env['PATH'] = os.path.abspath(bindir) + ':' + env['PATH']
 
-    if version != '2017':
+    if not is_current(args.version):
         sp.Popen(
             ['tlmgr', 'option', 'repository', OLDURL.format(v=version)],
             env=env
@@ -124,7 +124,7 @@ def main():
 
     if args.install:
         log.info('Start installing addtional packages')
-        sp.Popen(['tlmgr', 'install', args.install], env=env).wait()
+        sp.Popen(['tlmgr', 'install', *args.install.split(',')], env=env).wait()
         log.info('Finished')
 
 
