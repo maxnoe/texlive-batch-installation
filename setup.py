@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='install_texlive',
-    version='0.1.0',
+    version='0.2.0',
     description='Install texlive without human interaction in the process',
     url='http://github.com/maxnoe/texlive-batch-installation',
     author='Maximilian Noethe',
