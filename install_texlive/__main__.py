@@ -7,7 +7,7 @@ import tempfile
 import re
 import subprocess as sp
 
-from . import command, download, OLDURL, get_size, is_current
+from . import command, download, URL, OLDURL, get_size, is_current
 from .parser import parser
 
 
@@ -108,11 +108,14 @@ def main():
     env = os.environ
     env['PATH'] = os.path.abspath(bindir) + ':' + env['PATH']
 
-    if not is_current(args.version):
-        sp.Popen(
-            ['tlmgr', 'option', 'repository', OLDURL.format(v=version)],
-            env=env
-        ).wait()
+    if args.version is not None and not is_current(args.version):
+        repo = OLDURL.format(v=version)
+    else:
+        repo = URL
+    sp.Popen(
+        ['tlmgr', 'option', 'repository', repo],
+        env=env
+    ).wait()
 
     if args.update:
         log.info('Start updating')
