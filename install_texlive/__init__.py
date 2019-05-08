@@ -17,7 +17,7 @@ OLDURL = 'ftp://tug.org/historic/systems/texlive/{v}/tlnet-final/'
 def is_current(version):
     today = date.today()
     current_year = int(version) == today.year
-    last_year = int(version) == (today.year - 1) and today.month() < 7
+    last_year = int(version) == (today.year - 1) and today.month < 7
     return current_year or last_year
 
 
