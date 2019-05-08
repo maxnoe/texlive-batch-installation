@@ -3,7 +3,7 @@ language: python
 python: 3.5
 
 install:
-  - pip install pexpect
+  - pip install .
 
 script:
   - python -m install_texlive -c="-acfgPDFG" -t 2018 -p /home/travis/texlive -v
