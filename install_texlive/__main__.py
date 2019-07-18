@@ -35,7 +35,7 @@ def main():
         cmd = install_script
     else:
         directory = os.path.join(
-            tempfile.gettempdir(), 'texlive-' + (args.version or 'current')
+            tempfile.gettempdir(), 'texlive-{}'.format(args.version or 'current')
         )
         download(version=args.version, outdir=directory)
         install_script = glob(os.path.join(directory, 'install-tl-*/install-tl'))[-1]

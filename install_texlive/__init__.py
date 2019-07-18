@@ -5,6 +5,8 @@ import pexpect
 import re
 import requests
 import time
+from io import BytesIO
+import tarfile
 
 log = logging.getLogger(__name__)
 
@@ -12,7 +14,7 @@ has_curl = sp.call(['which', 'curl'], stdout=sp.PIPE) == 0
 has_wget = sp.call(['which', 'wget'], stdout=sp.PIPE) == 0
 
 URL = 'http://mirror.ctan.org/systems/texlive/tlnet/'
-OLDURL = 'ftp://tug.org/historic/systems/texlive/{v}/tlnet-final/'
+OLDURL = 'https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/{v}/tlnet-final/'
 
 
 def is_current(version):
@@ -23,7 +25,9 @@ def is_current(version):
     if not m:
         raise ValueError('Could not determine current TeX Live version')
 
-    return int(m.groups()[0]) == version
+    current_version = int(m.groups()[0])
+    log.debug('Current version of TeX Live is {}'.format(current_version))
+    return current_version == version
 
 
 def download(version=None, outdir='.'):
@@ -34,24 +38,13 @@ def download(version=None, outdir='.'):
     else:
         url = OLDURL.format(v=version) + 'install-tl-unx.tar.gz'
 
-    if has_curl:
-        log.info('Start downloading TeX Live {} using curl'.format(version or 'current'))
-        download = sp.Popen(['curl', '--fail', '-sSL', url], stdout=sp.PIPE, stderr=sp.PIPE)
-    elif has_wget:
-        log.info('Start downloading TeX Live {} using wget'.format(version or 'current'))
-        download = sp.Popen(['wget', '-qO-', url], stdout=sp.PIPE, stderr=sp.PIPE)
-    else:
-        raise IOError('Either curl or wget required')
+    log.debug('Downloading from {}'.format(url))
 
-    # check if download could be started
-    time.sleep(0.5)
-    code = download.poll()
-    if code is not None and code != 0:
-        raise ConnectionError('Could not download texlive: {}'.format(
-            download.stderr.read().decode()
-        ))
+    ret = requests.get(url)
+    ret.raise_for_status()
 
-    sp.check_call(['tar', 'xz', '--directory', outdir], stdin=download.stdout)
+    tar = tarfile.open(fileobj=BytesIO(ret.content), mode='r:gz')
+    tar.extractall(outdir)
 
 
 def command(process, pattern, send, **kwargs):

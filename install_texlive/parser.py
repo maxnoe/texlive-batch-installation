@@ -7,7 +7,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-t', '--texlive-version', dest='version',
+    '-t', '--texlive-version', dest='version', type=int,
     help='TeX Live version to install',
 )
 
