@@ -4,7 +4,6 @@ import os
 import pexpect
 import re
 import requests
-import time
 from io import BytesIO
 import tarfile
 
@@ -14,7 +13,7 @@ has_curl = sp.call(['which', 'curl'], stdout=sp.PIPE) == 0
 has_wget = sp.call(['which', 'wget'], stdout=sp.PIPE) == 0
 
 URL = 'http://mirror.ctan.org/systems/texlive/tlnet/'
-OLDURL = 'https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/{v}/tlnet-final/'
+OLDURL = 'https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/{v}/tlnet-final/'
 
 
 def is_current(version):
