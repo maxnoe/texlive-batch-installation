@@ -55,7 +55,7 @@ def main():
         pass
 
     try:
-        command(tl, 'Import settings', 'y' if args.keep else 'n', timeout=5)
+        command(tl, 'Import settings', 'y' if args.keep_config else 'n', timeout=5)
     except pexpect.TIMEOUT:
         log.info('No previous installation found')
 
@@ -112,22 +112,34 @@ def main():
         repo = OLDURL.format(v=version)
     else:
         repo = URL
-    sp.Popen(
+    sp.run(
         ['tlmgr', 'option', 'repository', repo],
-        env=env
-    ).wait()
+        env=env,
+        check=True,
+    )
 
     if args.update:
         log.info('Start updating')
-        sp.Popen(
+        sp.run(
             ['tlmgr', 'update', '--self', '--all', '--reinstall-forcibly-removed'],
             env=env,
-        ).wait()
+            check=True,
+        )
         log.info('Finished')
 
+    additional_packages = []
     if args.install:
+        additional_packages.extend(args.install.split(','))
+
+    if args.package_file:
+        with open(args.package_file, 'r') as f:
+            additional_packages.extend(f.read().splitlines())
+
+    if additional_packages:
         log.info('Start installing addtional packages')
-        sp.Popen(['tlmgr', 'install', *args.install.split(',')], env=env).wait()
+        # tlmgr must always be up to date to install packages
+        sp.run(['tlmgr', 'update', '--self'], env=env, check=True)
+        sp.run(['tlmgr', 'install', *additional_packages], env=env, check=True)
         log.info('Finished')
 
 

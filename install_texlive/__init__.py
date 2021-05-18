@@ -7,6 +7,8 @@ import requests
 from io import BytesIO
 import tarfile
 
+__version__ = '0.3.0'
+
 log = logging.getLogger(__name__)
 
 has_curl = sp.call(['which', 'curl'], stdout=sp.PIPE) == 0

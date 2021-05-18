@@ -1,6 +1,9 @@
 from argparse import ArgumentParser
+from . import __version__
 
-parser = ArgumentParser()
+parser = ArgumentParser(prog='install_texlive')
+
+parser.add_argument('-V', '--version', action='version', version=__version__)
 
 parser.add_argument(
     '-v', '--verbose', action='store_true', help='Create more verbose output'
@@ -12,22 +15,22 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '--install-tl', dest='install_tl',
+    '--install-tl',
     help='Path to the install-tl script. If not given, TeX Live will be downloaded.',
 )
 
 parser.add_argument(
-    '-k', '--keep-config', dest='keep', action='store_true',
+    '-k', '--keep-config', action='store_true',
     help='If an existing installation is found, keep its config',
 )
 
 parser.add_argument(
-    '-p', '--prefix', dest='prefix',
+    '-p', '--prefix',
     help='Installation prefix, equivalent to setting TEXLIVE_INSTALL_PREFIX'
 )
 
 parser.add_argument(
-    '-c', '--collections', dest='collections',
+    '-c', '--collections',
     help=(
         'The TeX Live package collections to install.'
         ' E.g. -a to deselect all and only install the absolute basic TeX packages'
@@ -35,18 +38,23 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-s', '--scheme', dest='scheme', choices=set('abcdefghijk'),
+    '-s', '--scheme', choices=set('abcdefghijk'),
     help='The TeX Live scheme to install. Default is "full"'
 )
 
 parser.add_argument(
-    '-u', '--update', dest='update', action='store_true',
+    '-u', '--update', action='store_true',
     help='Update TeX Live after installation is finished'
 )
 
 parser.add_argument(
-    '-i', '--install', dest='install',
+    '-i', '--install',
     help='Additional packages to install after the main Installation has finished as comma separated list'
+)
+
+parser.add_argument(
+    '-f', '--package-file',
+    help='A file with one package per line to be install after the main installation has finished'
 )
 
 parser.add_argument(
