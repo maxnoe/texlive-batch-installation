@@ -66,3 +66,7 @@ parser.add_argument(
     '--docs', action='store_true',
     help='Install the docs tree',
 )
+parser.add_argument(
+    '--link', action='store_true',
+    help='Add symbolic link: args.prefix/bin',
+)
