@@ -14,7 +14,7 @@ from .parser import parser
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('install_texlive')
 
-timeout = 30
+timeout = 60
 
 
 def main():
@@ -107,6 +107,13 @@ def main():
     version = re.findall(r'20[0-9][0-9]', bindir)[0]
     env = os.environ
     env['PATH'] = os.path.abspath(bindir) + ':' + env['PATH']
+    linkpath = '{}'.format(args.prefix or '/usr/local/texlive') + '/bin'
+    try:
+        os.symlink(bindir, linkpath)
+    except FileExistsError:
+        os.remove(linkpath)
+        os.symlink(bindir, linkpath)
+
 
     if args.version is not None and not is_current(args.version):
         repo = OLDURL.format(v=version)
