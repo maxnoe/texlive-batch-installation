@@ -14,7 +14,7 @@ from .parser import parser
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('install_texlive')
 
-timeout = 60
+timeout = 120
 
 
 def main():
