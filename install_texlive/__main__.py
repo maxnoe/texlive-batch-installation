@@ -50,12 +50,13 @@ def main():
     tl = pexpect.spawn(cmd, timeout=timeout)
 
     try:
-        command(tl, 'installation.profile', 'N', timeout=5)
+        command(tl, 'installation.profile', 'N', timeout=timeout)
     except pexpect.TIMEOUT:
         pass
 
     try:
-        command(tl, 'Import settings', 'y' if args.keep_config else 'n', timeout=5)
+        command(tl, 'Import settings', 'y' if args.keep_config else 'n',
+                timeout=timeout)
     except pexpect.TIMEOUT:
         log.info('No previous installation found')
 
