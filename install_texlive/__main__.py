@@ -9,6 +9,7 @@ import subprocess as sp
 
 from . import command, download, URL, OLDURL, get_size, is_current
 from .parser import parser
+from pudb import set_trace
 
 
 logging.basicConfig(level=logging.INFO)
@@ -47,12 +48,19 @@ def main():
 
     log.info(cmd)
 
-    tl = pexpect.spawn(cmd, timeout=timeout)
+    set_trace()
+    while True:
+        tl = pexpect.spawn(cmd, timeout=timeout)
 
-    try:
-        command(tl, 'installation.profile', 'N', timeout=timeout)
-    except pexpect.TIMEOUT:
-        pass
+        try:
+            command(tl, 'installation.profile', 'N', timeout=timeout)
+        except pexpect.TIMEOUT:
+            pass
+        except pexpect.exceptions.EOF:
+            print('Wrong URL, restart installation')
+            continue
+        else:
+            break
 
     try:
         command(tl, 'Import settings', 'y' if args.keep_config else 'n',
