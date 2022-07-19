@@ -14,7 +14,7 @@ from .parser import parser
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('install_texlive')
 
-timeout = 30
+timeout = 60
 
 
 def main():
@@ -97,10 +97,12 @@ def main():
         except pexpect.TIMEOUT:
             log.error('Something went wrong, install time out')
             tl.close()
+            shutil.rmtree(args.prefix)
             continue
         except pexpect.exceptions.EOF:
             log.error('Wrong URL, restart installation')
             tl.close()
+            shutil.rmtree(args.prefix)
             continue
 
         lines = ''
@@ -112,14 +114,17 @@ def main():
         except pexpect.EOF:
             log.error('line EOF')
             tl.close()
+            shutil.rmtree(args.prefix)
             continue
         except pexpect.TIMEOUT:
             log.error('Something went wrong, readline time out')
             tl.close()
+            shutil.rmtree(args.prefix)
             continue
         except pexpect.exceptions.EOF:
             log.error('line EOF')
             tl.close()
+            shutil.rmtree(args.prefix)
             continue
 
         tl.close()
@@ -128,6 +133,7 @@ def main():
         else:
             log.error('Installation did not finish succesfully')
             tl.close()
+            shutil.rmtree(args.prefix)
             continue
 
         bindir = re.findall(r'Most importantly, add\s+(.*)\s+to your PATH', lines)[0].strip()
