@@ -15,7 +15,7 @@ from pudb import set_trace
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('install_texlive')
 
-timeout = 120
+timeout = 30
 
 
 def main():
@@ -48,116 +48,138 @@ def main():
 
     log.info(cmd)
 
-    set_trace()
     while True:
+        log.info('Install texlive')
         tl = pexpect.spawn(cmd, timeout=timeout)
 
         try:
             command(tl, 'installation.profile', 'N', timeout=timeout)
         except pexpect.TIMEOUT:
-            pass
+            log.info('No installation profile')
         except pexpect.exceptions.EOF:
-            print('Wrong URL, restart installation')
+            log.error('Wrong URL, restart installation')
+            tl.close()
             continue
+
+        try:
+            command(tl, 'Import settings', 'y' if args.keep_config else 'n',
+                    timeout=timeout)
+        except pexpect.TIMEOUT:
+            log.info('No previous installation found')
+        except pexpect.exceptions.EOF:
+            log.error('Wrong URL, restart installation')
+            tl.close()
+            continue
+
+        try:
+            if args.scheme:
+                command(tl, 'Enter command:', 'S', timeout=timeout)
+                command(tl, 'Enter letter', args.scheme, timeout=timeout)
+                command(tl, 'Enter letter', 'R', timeout=timeout)
+
+            if args.collections:
+                command(tl, 'Enter command:', 'C', timeout=timeout)
+                command(tl, 'Enter letter', args.collections, timeout=timeout)
+                command(tl, 'Enter letter', 'R', timeout=timeout)
+
+            if not args.docs:
+                command(tl, 'Enter command:', 'O', timeout=timeout)
+                command(tl, 'Enter command:', 'D', timeout=timeout)
+                command(tl, 'Enter command:', 'R', timeout=timeout)
+
+            if not args.source:
+                command(tl, 'Enter command:', 'O', timeout=timeout)
+                command(tl, 'Enter command:', 'S', timeout=timeout)
+                command(tl, 'Enter command:', 'R', timeout=timeout)
+
+            log.info('Installation size will be {}'.format(get_size(tl)))
+            log.info('Starting installation')
+            command(tl, 'Enter command:', 'I', timeout=timeout)
+        except pexpect.TIMEOUT:
+            log.error('Something went wrong, install time out')
+            tl.close()
+            continue
+        except pexpect.exceptions.EOF:
+            log.error('Wrong URL, restart installation')
+            tl.close()
+            continue
+
+        lines = ''
+        try:
+            while not tl.terminated:
+                line = tl.readline().decode()
+                log.debug(line.strip())
+                lines += line
+        except pexpect.EOF:
+            log.error('line EOF')
+            tl.close()
+            continue
+        except pexpect.TIMEOUT:
+            log.error('Something went wrong, readline time out')
+            tl.close()
+            continue
+        except pexpect.exceptions.EOF:
+            log.error('line EOF')
+            tl.close()
+            continue
+
+        tl.close()
+        if tl.exitstatus == 0:
+            log.info('Installation installed succesfully')
         else:
-            break
+            log.error('Installation did not finish succesfully')
+            tl.close()
+            continue
 
-    try:
-        command(tl, 'Import settings', 'y' if args.keep_config else 'n',
-                timeout=timeout)
-    except pexpect.TIMEOUT:
-        log.info('No previous installation found')
+        bindir = re.findall(r'Most importantly, add\s+(.*)\s+to your PATH', lines)[0].strip()
+        version = re.findall(r'20[0-9][0-9]', bindir)[0]
+        env = os.environ
+        env['PATH'] = os.path.abspath(bindir) + ':' + env['PATH']
 
-    try:
-        if args.scheme:
-            command(tl, 'Enter command:', 'S', timeout=timeout)
-            command(tl, 'Enter letter', args.scheme, timeout=timeout)
-            command(tl, 'Enter letter', 'R', timeout=timeout)
-
-        if args.collections:
-            command(tl, 'Enter command:', 'C', timeout=timeout)
-            command(tl, 'Enter letter', args.collections, timeout=timeout)
-            command(tl, 'Enter letter', 'R', timeout=timeout)
-
-        if not args.docs:
-            command(tl, 'Enter command:', 'O', timeout=timeout)
-            command(tl, 'Enter command:', 'D', timeout=timeout)
-            command(tl, 'Enter command:', 'R', timeout=timeout)
-
-        if not args.source:
-            command(tl, 'Enter command:', 'O', timeout=timeout)
-            command(tl, 'Enter command:', 'S', timeout=timeout)
-            command(tl, 'Enter command:', 'R', timeout=timeout)
-
-        log.info('Installation size will be {}'.format(get_size(tl)))
-        log.info('Starting installation')
-        command(tl, 'Enter command:', 'I', timeout=timeout)
-    except pexpect.TIMEOUT:
-        log.error('Something went wrong')
-        sys.exit(1)
-
-    lines = ''
-    try:
-        while not tl.terminated:
-            line = tl.readline().decode()
-            log.debug(line.strip())
-            lines += line
-    except pexpect.EOF:
-        log.error('EOF')
-
-    tl.close()
-    if tl.exitstatus == 0:
-        log.info('Installation installed succesfully')
-    else:
-        log.error('Installation did not finish succesfully')
-        sys.exit(tl.exitstatus)
-
-    bindir = re.findall(r'Most importantly, add\s+(.*)\s+to your PATH', lines)[0].strip()
-    version = re.findall(r'20[0-9][0-9]', bindir)[0]
-    env = os.environ
-    env['PATH'] = os.path.abspath(bindir) + ':' + env['PATH']
-
-    if args.version is not None and not is_current(args.version):
-        repo = OLDURL.format(v=version)
-    else:
-        repo = URL
-    sp.run(
-        ['tlmgr', 'option', 'repository', repo],
-        env=env,
-        check=True,
-    )
-
-    if args.update:
-        log.info('Start updating')
+        if args.version is not None and not is_current(args.version):
+            repo = OLDURL.format(v=version)
+        else:
+            repo = URL
         sp.run(
-            ['tlmgr', 'update', '--self', '--all', '--reinstall-forcibly-removed'],
+            ['tlmgr', 'option', 'repository', repo],
             env=env,
             check=True,
         )
-        log.info('Finished')
 
-    additional_packages = []
-    if args.install:
-        additional_packages.extend(args.install.split(','))
+        if args.update:
+            log.info('Start updating')
+            sp.run(
+                ['tlmgr', 'update', '--self', '--all', '--reinstall-forcibly-removed'],
+                env=env,
+                check=True,
+            )
+            log.info('Finished')
 
-    if args.package_file:
-        with open(args.package_file, 'r') as f:
-            additional_packages.extend(f.read().splitlines())
+        additional_packages = []
+        if args.install:
+            additional_packages.extend(args.install.split(','))
 
-    if additional_packages:
-        log.info('Start installing addtional packages')
-        # tlmgr must always be up to date to install packages
-        sp.run(['tlmgr', 'update', '--self'], env=env, check=True)
-        sp.run(['tlmgr', 'install', *additional_packages], env=env, check=True)
-        log.info('Finished')
+        if args.package_file:
+            with open(args.package_file, 'r') as f:
+                additional_packages.extend(f.read().splitlines())
 
-    if args.link:
-        linkpath = '{}'.format(args.prefix or '/usr/local/texlive') + '/bin'
-        try:
-            os.symlink(bindir, linkpath)
-        except FileExistsError:
-            os.remove(linkpath)
-            os.symlink(bindir, linkpath)
+        if additional_packages:
+            log.info('Start installing addtional packages')
+            # tlmgr must always be up to date to install packages
+            sp.run(['tlmgr', 'update', '--self'], env=env, check=True)
+            sp.run(['tlmgr', 'install', *additional_packages], env=env, check=True)
+            log.info('Finished')
+
+        if args.link:
+            linkpath = '{}'.format(args.prefix or '/usr/local/texlive') + '/bin'
+            try:
+                os.symlink(bindir, linkpath)
+            except FileExistsError:
+                os.remove(linkpath)
+                os.symlink(bindir, linkpath)
+            finally:
+                log.info('Link finished')
+        break
 
 
 if __name__ == '__main__':
