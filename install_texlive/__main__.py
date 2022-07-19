@@ -23,13 +23,6 @@ def main():
     if args.verbose:
         log.level = logging.DEBUG
 
-    if args.prefix:
-        args.prefix = os.path.abspath(args.prefix)
-        os.environ['TEXLIVE_INSTALL_PREFIX'] = args.prefix
-        os.makedirs(args.prefix, exist_ok=True)
-
-    log.info('Installing texlive to {}'.format(args.prefix or '/usr/local/texlive'))
-
     if args.install_tl:
         install_script = args.install_tl
         cmd = install_script
@@ -45,11 +38,18 @@ def main():
         else:
             cmd = install_script + ' --repository=' + OLDURL.format(v=args.version)
 
-    log.info(cmd)
-
     while True:
         log.info('Install texlive')
+
         tl = pexpect.spawn(cmd, timeout=timeout)
+
+        if args.prefix:
+            args.prefix = os.path.abspath(args.prefix)
+            os.environ['TEXLIVE_INSTALL_PREFIX'] = args.prefix
+            os.makedirs(args.prefix, exist_ok=True)
+
+        log.info('Installing texlive to {}'.format(args.prefix or '/usr/local/texlive'))
+        log.info(cmd)
 
         try:
             command(tl, 'installation.profile', 'N', timeout=timeout)
