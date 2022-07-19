@@ -9,7 +9,6 @@ import subprocess as sp
 
 from . import command, download, URL, OLDURL, get_size, is_current
 from .parser import parser
-from pudb import set_trace
 
 
 logging.basicConfig(level=logging.INFO)
