@@ -4,6 +4,7 @@ import os
 import sys
 import logging
 import tempfile
+import shutil
 import re
 import subprocess as sp
 
