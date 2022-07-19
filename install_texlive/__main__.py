@@ -53,7 +53,7 @@ def main():
         log.info(cmd)
 
         try:
-            command(tl, 'installation.profile', 'N', timeout=timeout)
+            command(tl, 'installation.profile', 'N', timeout=5)
         except pexpect.TIMEOUT:
             log.info('No installation profile')
         except pexpect.exceptions.EOF:
@@ -63,7 +63,7 @@ def main():
 
         try:
             command(tl, 'Import settings', 'y' if args.keep_config else 'n',
-                    timeout=timeout)
+                    timeout=5)
         except pexpect.TIMEOUT:
             log.info('No previous installation found')
         except pexpect.exceptions.EOF:
