@@ -59,6 +59,7 @@ def main():
         except pexpect.exceptions.EOF:
             log.error('Wrong URL, restart installation')
             tl.close()
+            timeout += 100
             continue
 
         try:
@@ -69,6 +70,7 @@ def main():
         except pexpect.exceptions.EOF:
             log.error('Wrong URL, restart installation')
             tl.close()
+            timeout += 100
             continue
 
         try:
@@ -99,11 +101,13 @@ def main():
             log.error('Something went wrong, install time out')
             tl.close()
             shutil.rmtree(args.prefix)
+            timeout += 100
             continue
         except pexpect.exceptions.EOF:
             log.error('Wrong URL, restart installation')
             tl.close()
             shutil.rmtree(args.prefix)
+            timeout += 100
             continue
 
         lines = ''
@@ -116,16 +120,19 @@ def main():
             log.error('line EOF')
             tl.close()
             shutil.rmtree(args.prefix)
+            timeout += 100
             continue
         except pexpect.TIMEOUT:
             log.error('Something went wrong, readline time out')
             tl.close()
             shutil.rmtree(args.prefix)
+            timeout += 100
             continue
         except pexpect.exceptions.EOF:
             log.error('line EOF')
             tl.close()
             shutil.rmtree(args.prefix)
+            timeout += 100
             continue
 
         tl.close()
@@ -135,6 +142,7 @@ def main():
             log.error('Installation did not finish succesfully')
             tl.close()
             shutil.rmtree(args.prefix)
+            timeout += 100
             continue
 
         bindir = re.findall(r'Most importantly, add\s+(.*)\s+to your PATH', lines)[0].strip()
