@@ -15,10 +15,8 @@ from .parser import parser
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('install_texlive')
 
-timeout = 60
 
-
-def main():
+def main(timeout=60):
     args = parser.parse_args()
 
     if args.verbose:
