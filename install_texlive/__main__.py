@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('install_texlive')
 
 
-def main(timeout=60):
+def main(timeout=3600):
     args = parser.parse_args()
 
     if args.verbose:
