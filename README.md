@@ -1,6 +1,7 @@
 # texlive batch install [![Build Status](https://travis-ci.org/MaxNoe/texlive-batch-installation.svg?branch=master)](https://travis-ci.org/MaxNoe/texlive-batch-installation)
 
-The TeX Live installer does not allow for interaction less installation.
+The TeX Live installer does not allow for interaction-less installation.
+
 This is the reason why I created this project using pexpect to talk to the `install-tl`
 script.
 
@@ -35,4 +36,21 @@ optional arguments:
                         Installation has finished
   --source              Install the source tree
   --docs                Install the docs tree
+```
+
+
+For a minimal installation (e.g. for CI jobs building documents), it is recommended to
+only install the bare minimum selection of package collections: `-c "-a"` and then
+have a file `tex-packages.txt` with the actually needed packages to compile the document:
+
+```
+$ python -m install_texlive -p .texlive -t 2022 --collections='-a' --package-file tex-packages.txt --update
+```
+
+To find out which package provides which style file (e.g. to find out which CTAN package provides `scrartcl.cls`), this command is helpful:
+
+```
+$ tlmgr search --global --file '/scrartcl.cls'
+koma-script:
+	texmf-dist/tex/latex/koma-script/scrartcl.cls
 ```
