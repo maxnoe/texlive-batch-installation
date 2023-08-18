@@ -136,7 +136,7 @@ def main():
             additional_packages.extend(f.read().splitlines())
 
     if additional_packages:
-        log.info('Start installing addtional packages')
+        log.info('Start installing additional packages')
         # tlmgr must always be up to date to install packages
         sp.run(['tlmgr', 'update', '--self'], env=env, check=True)
         sp.run(['tlmgr', 'install', *additional_packages], env=env, check=True)
