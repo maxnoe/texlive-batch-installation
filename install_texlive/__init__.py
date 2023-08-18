@@ -6,11 +6,11 @@ import requests
 from io import BytesIO
 import tarfile
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 log = logging.getLogger(__name__)
 
-URL = 'http://mirror.ctan.org/systems/texlive/tlnet/'
+URL = 'https://mirror.ctan.org/systems/texlive/tlnet/'
 OLDURL = 'https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/{v}/tlnet-final/'
 
 
