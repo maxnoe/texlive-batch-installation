@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '**'
+  pull_request:
+
+  schedule:
+    - cron: '0 16 * * 1'  # Build every monday, 16:00
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install
+        run: |
+          python --version
+          pip install .
+
+      - name: Test TL2022
+        run: |
+          python -m install_texlive -c="-a" -t 2022 -p $HOME/texlive -f tex-packages.txt -v 
+          export PATH=$HOME/texlive/2022/bin/x86_64-linux:$PATH
+          latexmk -lualatex -halt-on-error -interaction=nonstopmode hello.tex
+          latexmk -c hello.tex
+
+      - name: Test TL current
+        run: |
+          python -m install_texlive -c="-a" -p $HOME/texlive -v -f tex-packages.txt
+          export PATH=$HOME/texlive/2023/bin/x86_64-linux:$PATH
+          latexmk -lualatex -halt-on-error -interaction=nonstopmode hello.tex
