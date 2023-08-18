@@ -1,5 +1,4 @@
 import logging
-import subprocess as sp
 import os
 import pexpect
 import re
@@ -7,14 +6,11 @@ import requests
 from io import BytesIO
 import tarfile
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 log = logging.getLogger(__name__)
 
-has_curl = sp.call(['which', 'curl'], stdout=sp.PIPE) == 0
-has_wget = sp.call(['which', 'wget'], stdout=sp.PIPE) == 0
-
-URL = 'http://mirror.ctan.org/systems/texlive/tlnet/'
+URL = 'https://mirror.ctan.org/systems/texlive/tlnet/'
 OLDURL = 'https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/{v}/tlnet-final/'
 
 
