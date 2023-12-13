@@ -110,13 +110,12 @@ def main():
 
     if args.version is not None and not is_current(args.version):
         repo = OLDURL.format(v=version)
-    else:
-        repo = URL
-    sp.run(
-        ['tlmgr', 'option', 'repository', repo],
-        env=env,
-        check=True,
-    )
+
+        sp.run(
+            ['tlmgr', 'option', 'repository', repo],
+            env=env,
+            check=True,
+        )
 
     if args.update:
         log.info('Start updating')
