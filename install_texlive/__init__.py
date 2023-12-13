@@ -5,6 +5,7 @@ import re
 import requests
 from io import BytesIO
 import tarfile
+from functools import lru_cache
 
 __version__ = '0.3.2'
 
@@ -14,6 +15,7 @@ URL = 'https://mirror.ctan.org/systems/texlive/tlnet/'
 OLDURL = 'https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/{v}/tlnet-final/'
 
 
+@lru_cache
 def is_current(version):
     r = requests.get('https://tug.org/texlive/')
     r.raise_for_status()
