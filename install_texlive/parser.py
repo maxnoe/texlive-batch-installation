@@ -66,3 +66,8 @@ parser.add_argument(
     '--docs', action='store_true',
     help='Install the docs tree',
 )
+
+parser.add_argument(
+    "-r", "--repository",
+    help="If given, set ctan mirror to this URL.",
+)

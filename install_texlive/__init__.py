@@ -29,11 +29,12 @@ def is_current(version):
     return current_version == version
 
 
-def download(version=None, outdir='.'):
+def download(version=None, outdir='.', url=None):
     os.makedirs(outdir, exist_ok=True)
 
     if version is None or is_current(version):
-        url = URL + 'install-tl-unx.tar.gz'
+        url = url or URL
+        url = url.rstrip("/") + '/install-tl-unx.tar.gz'
     else:
         url = OLDURL.format(v=version) + 'install-tl-unx.tar.gz'
 
