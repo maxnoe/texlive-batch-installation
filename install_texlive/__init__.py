@@ -7,7 +7,7 @@ from io import BytesIO
 import tarfile
 from functools import lru_cache
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 log = logging.getLogger(__name__)
 
