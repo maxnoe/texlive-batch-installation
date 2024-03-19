@@ -36,5 +36,5 @@ jobs:
       - name: Test TL current
         run: |
           python -m install_texlive -c="-a" -p $HOME/texlive -v -f tex-packages.txt
-          export PATH=$HOME/texlive/2023/bin/x86_64-linux:$PATH
+          export PATH=$HOME/texlive/2024/bin/x86_64-linux:$PATH
           latexmk -lualatex -halt-on-error -interaction=nonstopmode hello.tex
