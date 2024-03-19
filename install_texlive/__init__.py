@@ -6,8 +6,11 @@ import requests
 from io import BytesIO
 import tarfile
 from functools import lru_cache
+from io import StringIO
+from html.parser import HTMLParser
 
-__version__ = '0.3.3'
+
+__version__ = '0.3.4'
 
 log = logging.getLogger(__name__)
 
@@ -15,12 +18,30 @@ URL = 'https://mirror.ctan.org/systems/texlive/tlnet/'
 OLDURL = 'https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/{v}/tlnet-final/'
 
 
+class GetText(HTMLParser):
+    """Only extract text of html page"""
+
+    def __init__(self):
+        super().__init__()
+        self._text = StringIO()
+
+    def handle_data(self, d):
+        self._text.write(d)
+
+    @property
+    def text(self):
+        return self._text.getvalue()
+
+
 @lru_cache
 def is_current(version):
     r = requests.get('https://tug.org/texlive/')
     r.raise_for_status()
 
-    m = re.search(r'Current release: TeX Live ([0-9]{4})', r.text)
+    parser = GetText()
+    parser.feed(r.text)
+
+    m = re.search(r'Current release: TeX Live ([0-9]{4})', parser.text)
     if not m:
         raise ValueError('Could not determine current TeX Live version')
 
