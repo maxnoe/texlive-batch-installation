@@ -29,6 +29,13 @@ def is_current(version):
     return current_version == version
 
 
+def get_mirror():
+    """Get a CTAN mirror"""
+    r = requests.get(URL, allow_redirects=False)
+    r.raise_for_status()
+    return r.headers["Location"]
+
+
 def download(version=None, outdir='.', url=None):
     os.makedirs(outdir, exist_ok=True)
 

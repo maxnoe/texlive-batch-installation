@@ -7,7 +7,7 @@ import tempfile
 import re
 import subprocess as sp
 
-from . import command, download, OLDURL, get_size, is_current
+from . import command, download, OLDURL, get_size, is_current, get_mirror
 from .parser import parser
 
 
@@ -31,20 +31,23 @@ def main():
     os.environ["TEXLIVE_INSTALL_ENV_NOCHECK"] = "1"
     log.info('Installing texlive to {}'.format(args.prefix or '/usr/local/texlive'))
 
+    if args.repository is None:
+        if args.version is None or is_current(args.version):
+            args.repository = get_mirror()
+        else:
+            args.repository = OLDURL.format(v=args.version)
+
     if args.install_tl:
         install_script = args.install_tl
         cmd = install_script
     else:
+        log.info("Using repository: %s", args.repository)
         directory = os.path.join(
             tempfile.gettempdir(), 'texlive-{}'.format(args.version or 'current')
         )
         download(version=args.version, outdir=directory, url=args.repository)
         install_script = glob(os.path.join(directory, 'install-tl-*/install-tl'))[-1]
-
-        if args.version is None or is_current(args.version):
-            cmd = install_script
-        else:
-            cmd = install_script + ' --repository=' + OLDURL.format(v=args.version)
+        cmd = install_script + ' --repository={}'.format(args.repository) 
 
     log.info(cmd)
 
