@@ -1,3 +1,35 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=60", "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "install-texlive"
+description = "Install texlive without human interaction in the process"
+license = {text = "MIT License"}
+authors = [
+    { name = "Maximilian Linhoff", email = "maximilian.linhoff@tu-dortmund.de" },
+]
+requires-python = ">=3.8"
+dependencies = [
+	"pexpect",
+	"requests",
+]
+readme = "README.md"
+dynamic = ["version"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Text Processing :: Markup :: LaTeX",
+]
+
+[project.urls]
+repository = "http://github.com/maxnoe/texlive-batch-installation"
+
+[project.scripts]
+install_texlive = "install_texlive.__main__:main"
+
+[tool.setuptools_scm]
+version_file = "install_texlive/_version.py"

@@ -1,4 +1,4 @@
-# texlive batch install [![Build Status](https://travis-ci.org/MaxNoe/texlive-batch-installation.svg?branch=master)](https://travis-ci.org/MaxNoe/texlive-batch-installation)
+# texlive batch install [![CI](https://github.com/maxnoe/texlive-batch-installation/actions/workflows/ci.yml/badge.svg)](https://github.com/maxnoe/texlive-batch-installation/actions/workflows/ci.yml)
 
 The TeX Live installer does not allow for interaction-less installation.
 

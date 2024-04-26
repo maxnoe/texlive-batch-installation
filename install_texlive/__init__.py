@@ -8,9 +8,21 @@ import tarfile
 from functools import lru_cache
 from io import StringIO
 from html.parser import HTMLParser
+from ._version import __version__, __version_tuple__
 
 
-__version__ = '0.3.4'
+__all__ = [
+    "__version__",
+    "__version_tuple__",
+    "command",
+    "download",
+    "get_mirror",
+    "get_size",
+    "is_current",
+    "URL",
+    "OLDURL",
+]
+
 
 log = logging.getLogger(__name__)
 
