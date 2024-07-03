@@ -7,7 +7,7 @@ import tempfile
 import re
 import subprocess as sp
 
-from . import command, download, OLDURL, get_size, is_current, get_mirror
+from . import command, download, OLDURL, URL, get_size, is_current, get_mirror
 from .parser import parser
 
 
@@ -31,9 +31,11 @@ def main():
     os.environ["TEXLIVE_INSTALL_ENV_NOCHECK"] = "1"
     log.info('Installing texlive to {}'.format(args.prefix or '/usr/local/texlive'))
 
+    reset_repository = False
     if args.repository is None:
         if args.version is None or is_current(args.version):
             args.repository = get_mirror()
+            reset_repository = True
         else:
             args.repository = OLDURL.format(v=args.version)
 
@@ -147,6 +149,10 @@ def main():
         sp.run(['tlmgr', 'update', '--self'], env=env, check=True)
         sp.run(['tlmgr', 'install', *additional_packages], env=env, check=True)
         log.info('Finished')
+
+    if reset_repository:
+        log.info("Resetting repository to default CTAN mirror")
+        sp.run(['tlmgr', 'option', 'repository', URL])
 
 
 if __name__ == '__main__':
