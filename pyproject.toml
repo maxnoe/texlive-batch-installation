@@ -9,7 +9,7 @@ license = {text = "MIT License"}
 authors = [
     { name = "Maximilian Linhoff", email = "maximilian.linhoff@tu-dortmund.de" },
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 dependencies = [
 	"pexpect",
 	"requests",
