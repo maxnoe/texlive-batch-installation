@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -36,11 +36,15 @@ jobs:
         run: |
           python -m install_texlive -c="-a" -t 2022 -p $HOME/texlive -f tex-packages.txt -v 
           export PATH=$HOME/texlive/2022/bin/x86_64-linux:$PATH
+          hash -r
+          which latexmk
           latexmk -lualatex -halt-on-error -interaction=nonstopmode hello.tex
           latexmk -c hello.tex
 
       - name: Test TL current
         run: |
           python -m install_texlive -c="-a" -p $HOME/texlive -v -f tex-packages.txt
-          export PATH=$HOME/texlive/2025/bin/x86_64-linux:$PATH
+          export PATH=$HOME/texlive/2026/bin/x86_64-linux:$PATH
+          hash -r
+          which latexmk
           latexmk -lualatex -halt-on-error -interaction=nonstopmode hello.tex
