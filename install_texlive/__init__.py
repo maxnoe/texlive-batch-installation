@@ -48,9 +48,7 @@ class GetText(HTMLParser):
 @lru_cache
 def is_current(version):
     headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (X11; Linux x86_64)"
-        )
+        "User-Agent": f"install-texlive/{version}"
     }
     r = requests.get('https://tug.org/texlive/', headers=headers)
     r.raise_for_status()
