@@ -5,7 +5,7 @@ import re
 import requests
 from io import BytesIO
 import tarfile
-from functools import lru_cache
+from functools import cache
 from io import StringIO
 from html.parser import HTMLParser
 from ._version import __version__, __version_tuple__
@@ -28,6 +28,8 @@ log = logging.getLogger(__name__)
 
 URL = 'https://mirror.ctan.org/systems/texlive/tlnet/'
 OLDURL = 'https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/{v}/tlnet-final/'
+USER_AGENT = f'texlive-batch-installation/{__version__}'
+DEFAULT_HEADERS = {"User-Agent": USER_AGENT}
 
 
 class GetText(HTMLParser):
@@ -45,12 +47,9 @@ class GetText(HTMLParser):
         return self._text.getvalue()
 
 
-@lru_cache
-def is_current(version):
-    headers = {
-        "User-Agent": f"install-texlive/{version}"
-    }
-    r = requests.get('https://tug.org/texlive/', headers=headers)
+@cache
+def get_current_texlive():
+    r = requests.get('https://tug.org/texlive/', headers=DEFAULT_HEADERS)
     r.raise_for_status()
 
     parser = GetText()
@@ -62,12 +61,17 @@ def is_current(version):
 
     current_version = int(m.groups()[0])
     log.debug('Current version of TeX Live is {}'.format(current_version))
-    return current_version == version
+
+    return current_version
+
+@cache
+def is_current(version):
+    return version == get_current_texlive()
 
 
 def get_mirror():
     """Get a CTAN mirror"""
-    r = requests.get(URL, allow_redirects=False)
+    r = requests.get(URL, allow_redirects=False, headers=DEFAULT_HEADERS)
     r.raise_for_status()
     return r.headers["Location"]
 
@@ -83,7 +87,7 @@ def download(version=None, outdir='.', url=None):
 
     log.debug('Downloading from {}'.format(url))
 
-    ret = requests.get(url)
+    ret = requests.get(url, headers=DEFAULT_HEADERS)
     ret.raise_for_status()
 
     tar = tarfile.open(fileobj=BytesIO(ret.content), mode='r:gz')
